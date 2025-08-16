@@ -74,3 +74,10 @@ To create the setup file yourself, run the following command in your terminal fr
 
 ```bash
 npm run make
+
+---
+## ☕ Support the Creator
+
+If you find this application helpful and would like to support my work, you can buy me a coffee! Any support is greatly appreciated.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kirakhaos)
