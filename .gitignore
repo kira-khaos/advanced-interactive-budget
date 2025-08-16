@@ -1,0 +1,25 @@
+# Dependencies
+/node_modules
+
+# Build files
+/out
+/dist
+/.electron
+/.vercel
+
+# EXCEPTIONS: Keep the final installers, but ignore everything else.
+# The '!' negates the rule above for specific files.
+!/out/make/**/*.exe
+!/out/make/**/*.zip
+!/out/make/**/*.deb
+!/out/make/**/*.rpm
+!/out/make/**/*.dmg
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-generated files
+.DS_Store
+Thumbs.db

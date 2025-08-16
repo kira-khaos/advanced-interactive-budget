@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Interactive Budget</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav id="sticky-nav" class="hidden">
+    <ul>
+        <button id="sticky-nav-toggle" title="Collapse Navigation">«</button>
+        <li><a href="#categories-header" data-section-id="categories">Categories</a></li>
+        <li><a href="#insights-header" data-section-id="insights">Insights</a></li>
+        <li><a href="#bills-header" data-section-id="bills">Bills</a></li>
+        <li><a href="#savings-header" data-section-id="savings">Savings</a></li>
+        <li><a href="#paychecks-header" data-section-id="paychecks">Paychecks</a></li>
+    </ul>
+</nav>
+<div id="toast-notification"></div>
+<div class="container" id="budget-container">
+    <h1>Advanced Interactive Budget</h1>
+    <div class="controls-panel" id="controls-panel">
+        <button id="save-btn" class="btn btn-save">Save</button>
+        <button id="reset-btn" class="btn btn-reset">Reset to Default</button>
+		<button id="clear-all-btn" class="btn btn-clear">Clear All</button>
+        <button id="theme-toggle" class="btn" style="margin-left: auto;">&#127769;</button>
+    </div>
+    <div class="settings-panel">
+        <div>
+            <label for="pay-frequency">Pay Frequency:</label>
+            <select id="pay-frequency">
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-weekly</option>
+            </select>
+        </div>
+        <div>
+            <input type="checkbox" id="enable-payday-advance">
+            <label for="enable-payday-advance">Enable Payday Advance/Overdraft</label>
+        </div>
+    </div>
+	<div id="balance-summary-container">
+		<div class="balance-item">
+			<h4>Projected Balance</h4>
+			<span id="projected-balance-display" class="balance-value">$0.00</span>
+		</div>
+		<div class="balance-item">
+			<h4>Actual Balance</h4>
+			<div class="actual-balance-input-wrapper">
+				<span class="balance-value">$</span>
+				<input type="number" id="actual-balance-input" class="balance-value" placeholder="Enter balance...">
+			</div>
+		</div>
+		<div class="balance-item">
+			<h4>Difference</h4>
+			<span id="balance-difference-display" class="balance-value">$0.00</span>
+		</div>
+	</div>
+	<h2 class="section-header" id="categories-header">
+        <span>Manage Categories</span>
+        <span class="toggle-arrow">▼</span>
+    </h2>
+    <div id="categories-container">
+       <div id="category-list">
+        </div>
+        <div class="add-category-form">
+            <input type="text" id="new-category-name" placeholder="New category name...">
+            <button id="add-category-btn" class="btn btn-save">Add Category</button>
+        </div>
+    </div>
+        <h2 class="section-header" id="insights-header">
+            <span>💡 Budget Insights</span>
+            <span class="toggle-arrow">▼</span>
+        </h2>
+		<div id="insights-container">
+        </div>
+    <h2 class="section-header" id="bills-header">
+        <span>Monthly Bills Overview</span>
+        <span class="toggle-arrow">▼</span>
+    </h2>
+    <div id="bills-container">
+        <table class="bills-table" id="bills-table">
+            <thead><tr><th></th><th>Bill</th><th>Amount</th><th>Due Date (Day)</th><th>Save Till Due</th><th>Notes</th></tr></thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr><td colspan="6"><button class="add-item-btn" id="add-bill-btn">+ Add New Bill</button></td></tr>
+            </tfoot>
+        </table>
+    </div>
+	<h2 class="section-header" id="savings-header">
+        <span>Savings Goals</span>
+        <span class="toggle-arrow">▼</span>
+        </h2>
+        <div id="savings-container">
+            <div class="savings-grid" id="savings-grid">
+            </div>
+            <button class="add-item-btn" id="add-savings-goal-btn">+ Add New Savings Goal</button>
+        </div>
+    <h2 class="section-header" id="paychecks-header">
+		<span>Paycheck Breakdown</span>
+		<span class="toggle-arrow">▼</span>
+	</h2>
+
+	<div id="paychecks-container">
+		<div id="negative-ticker-container" style="display: none;">
+			<h4>
+				<span>Attention: Negative Balances</span>
+				<span class="toggle-arrow">▼</span>
+			</h4>
+			<div id="negative-ticker-content">
+				<div id="negative-ticker-items"></div>
+			</div>
+		</div>
+		<div class="add-paycheck-panel">
+			<h4>Add New Paycheck</h4>
+			<div class="form-row">
+				<label for="new-paycheck-date">Paycheck Date:</label>
+				<input type="date" id="new-paycheck-date">
+				<label for="new-paycheck-amount">Base Net Pay:</label>
+				<input type="number" id="new-paycheck-amount" placeholder="e.g., 750.00" step="0.01">
+				<button id="add-paycheck-btn" class="btn btn-save">Add Paycheck</button>
+			</div>
+		</div>
+		<div class="paycheck-controls">
+			<div>
+				<label for="sort-paychecks">Sort By:</label>
+				<select id="sort-paychecks">
+					<option value="default">Default (Entry Order)</option>
+					<option value="date-desc">Date (Newest First)</option>
+					<option value="date-asc">Date (Oldest First)</option>
+					<option value="balance-desc">Balance (High to Low)</option>
+					<option value="balance-asc">Balance (Low to High)</option>
+				</select>
+			</div>
+			<div>
+				<label for="search-date">Find by Date:</label>
+				<input type="date" id="search-date">
+				<button id="clear-search-btn" class="btn">Clear</button>
+			</div>
+		</div>
+		<div class="paycheck-grid" id="paycheck-grid">
+		</div>
+		
+	<div class="pagination-controls" id="pagination-controls">
+			<button id="prev-page" class="btn">&laquo; Previous</button>
+			<span id="page-info"></span>
+			<button id="next-page" class="btn">Next &raquo;</button>
+			<div class="items-per-page-controls">
+				<label for="items-per-page">Show:</label>
+				<select id="items-per-page">
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="6">6</option>
+					<option value="12">12</option>
+					<option value="24">24</option>
+					<option value="48">48</option>
+					<option value="all">All</option>
+				</select>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="budget-modal" class="modal-hidden">
+    <div class="modal-content">
+        <h3 id="modal-title">Set Budget</h3>
+        <div class="modal-body">
+            <div class="modal-budget-summary">
+                <div class="circle-chart" id="modal-circle-chart">
+                    <div class="circle-chart-center" id="modal-circle-text"></div>
+                </div>
+                <div class="modal-form">
+                    <label for="modal-budget-amount">Monthly Budget:</label>
+                    <input type="number" id="modal-budget-amount" placeholder="e.g., 200.00" step="10">
+                </div>
+            </div>
+            <h4>Transaction History (This Month)</h4>
+            <div id="modal-transaction-list"></div>
+            <div id="modal-pagination-controls">
+                <button id="modal-prev-page" class="btn">&laquo; Prev</button>
+                <span id="modal-page-info"></span>
+                <button id="modal-next-page" class="btn">Next &raquo;</button>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button id="modal-save-btn" class="btn btn-save">Save</button>
+            <button id="modal-cancel-btn" class="btn">Cancel</button>
+        </div>
+    </div>
+</div>
+<script>
+
+// --- DATA & SETTINGS ---
+
+let appSettings = {
+    payFrequency: 'weekly',
+    isPaydayAdvanceEnabled: true,
+    isBillsCollapsed: false,
+    sortPreference: 'date-desc',
+    isTickerCollapsed: false,
+    itemsPerPage: 6,
+    isSavingsCollapsed: false,
+    isCategoriesCollapsed: false,
+	actualBalance: '',
+    isPaychecksCollapsed: false,
+    isNavCollapsed: false
+};
+
+let monthlyBillsData = [
+    { name: "Rent/Mortgage", amount: "$1200.00", dueDate: 1, notes: "Primary housing cost", saveTillDue: true },
+    { name: "Car Payment", amount: "$350.00", dueDate: 15, notes: "", saveTillDue: true },
+    { name: "Utilities", amount: "~$150.00", dueDate: 20, notes: "Electric, Water, Gas", saveTillDue: false },
+    { name: "Internet", amount: "$60.00", dueDate: 22, notes: "", saveTillDue: false },
+    { name: "Phone Bill", amount: "$85.00", dueDate: 25, notes: "", saveTillDue: false },
+    { name: "Student Loan", amount: "$200.00", dueDate: 28, notes: "", saveTillDue: false }
+];
+
+const DEFAULT_CATEGORIES = [
+    { id: 1, name: 'Groceries', isDefault: true, budget: 400 },
+    { id: 2, name: 'Dining Out', isDefault: true, budget: 150 },
+    { id: 3, name: 'Transportation', isDefault: true, budget: 100 },
+    { id: 4, name: 'Entertainment', isDefault: true, budget: 75 },
+    { id: 5, name: 'Shopping', isDefault: true, budget: 100 },
+    { id: 6, name: 'Subscriptions', isDefault: true, budget: 30 }
+];
+
+let categoriesData = [...DEFAULT_CATEGORIES];
+
+let expenseCategoryMap = {};
+
+let budgetData = [
+    { id: 1, date: "Paycheck - August 1", baseNetPay: 850.55, instantCo: 0, expenses: [ { name: "Rent/Mortgage", amount: 600.00, ignoreSavings: false }, { name: "Groceries", amount: 150.00, ignoreSavings: false }, { name: "Gas", amount: 40.00, ignoreSavings: false } ], income: [] },
+    { id: 2, date: "Paycheck - August 8", baseNetPay: 845.20, instantCo: 0, expenses: [ { name: "Rent/Mortgage", amount: 600.00, ignoreSavings: false }, { name: "Internet", amount: 60.00, ignoreSavings: false }, { name: "Groceries", amount: 120.00, ignoreSavings: false } ], income: [] },
+    { id: 3, date: "Paycheck - August 15", baseNetPay: 855.00, instantCo: 50, expenses: [ { name: "Car Payment", amount: 350.00, ignoreSavings: false }, { name: "Utilities", amount: 150.00, ignoreSavings: false }, { name: "Entertainment", amount: 100.00, ignoreSavings: false } ], income: [ { name: "Freelance Gig", amount: 150.00, ignoreSavings: false } ] },
+    { id: 4, date: "Paycheck - August 22", baseNetPay: 851.75, instantCo: 0, expenses: [ { name: "Phone Bill", amount: 85.00, ignoreSavings: false }, { name: "Student Loan", amount: 200.00, ignoreSavings: false }, { name: "Groceries", amount: 150.00, ignoreSavings: false } ], income: [] }
+];
+
+let savingsGoalsData = [
+    { id: 1, name: "Rainy Day Fund", goal: 1000 },
+    { id: 2, name: "New Car", goal: 5000 }
+];
+
+// --- APP STATE ---
+
+let currentPage = 1;
+const ITEMS_PER_PAGE = 6;
+let currentSearchDate = null;
+let currentAutocompleteInput = null;
+let modalCurrentPage = 1;
+const MODAL_ITEMS_PER_PAGE = 3;
+
+// --- DOM ELEMENTS ---
+
+const budgetContainer = document.getElementById('budget-container');
+const grid = document.getElementById('paycheck-grid');
+const saveBtn = document.getElementById('save-btn');
+const resetBtn = document.getElementById('reset-btn');
+const prevPageBtn = document.getElementById('prev-page');
+const nextPageBtn = document.getElementById('next-page');
+const pageInfo = document.getElementById('page-info');
+const controlsPanel = document.getElementById('controls-panel');
+const billsHeader = document.getElementById('bills-header');
+const billsContainer = document.getElementById('bills-container');
+const billsTable = document.getElementById('bills-table');
+const addBillBtn = document.getElementById('add-bill-btn');
+const themeToggle = document.getElementById('theme-toggle');
+const addPaycheckBtn = document.getElementById('add-paycheck-btn');
+const payFrequencySelect = document.getElementById('pay-frequency');
+const enablePaydayAdvanceCheckbox = document.getElementById('enable-payday-advance');
+const sortPaychecksSelect = document.getElementById('sort-paychecks');
+const searchDateInput = document.getElementById('search-date');
+const clearSearchBtn = document.getElementById('clear-search-btn');
+const negativeTickerContainer = document.getElementById('negative-ticker-container');
+const negativeTickerItems = document.getElementById('negative-ticker-items');
+const itemsPerPageSelect = document.getElementById('items-per-page');
+const savingsHeader = document.getElementById('savings-header');
+const savingsContainer = document.getElementById('savings-container');
+const savingsGrid = document.getElementById('savings-grid');
+const addSavingsGoalBtn = document.getElementById('add-savings-goal-btn');
+const projectedBalanceDisplay = document.getElementById('projected-balance-display');
+const clearAllBtn = document.getElementById('clear-all-btn');
+const insightsHeader = document.getElementById('insights-header');
+const insightsContainer = document.getElementById('insights-container');
+const categoriesHeader = document.getElementById('categories-header');
+const categoriesContainer = document.getElementById('categories-container');
+const categoryList = document.getElementById('category-list');
+const newCategoryInput = document.getElementById('new-category-name');
+const addCategoryBtn = document.getElementById('add-category-btn');
+const budgetModal = document.getElementById('budget-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalBudgetAmount = document.getElementById('modal-budget-amount');
+const modalSaveBtn = document.getElementById('modal-save-btn');
+const modalCancelBtn = document.getElementById('modal-cancel-btn');
+const modalPrevPage = document.getElementById('modal-prev-page');
+const modalNextPage = document.getElementById('modal-next-page');
+const modalPageInfo = document.getElementById('modal-page-info');
+const actualBalanceInput = document.getElementById('actual-balance-input');
+const balanceDifferenceDisplay = document.getElementById('balance-difference-display');
+const paychecksHeader = document.getElementById('paychecks-header');
+const paychecksContainer = document.getElementById('paychecks-container');
+const stickyNav = document.getElementById('sticky-nav');
+const stickyNavToggle = document.getElementById('sticky-nav-toggle');
+
+// --- HELPER FUNCTIONS ---
+
+const parseBillAmount = (amountStr) => parseFloat(String(amountStr).replace(/[^0-9.]/g, '')) || 0;
+
+const parsePaycheckDate = (dateStr) => {
+    const match = dateStr.match(/(\w+)\s(\d+)/);
+    if (!match) return null;
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const month = monthNames.indexOf(match[1]);
+    const day = parseInt(match[2], 10);
+    const now = new Date();
+    let year = now.getFullYear();
+    const currentMonth = now.getMonth();
+    if (month - currentMonth > 6) { year--; }
+    else if (currentMonth - month > 6) { year++; }
+    return new Date(year, month, day);
+};
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast-notification');
+    toast.textContent = message;
+    toast.style.backgroundColor = type === 'error' ? 'var(--negative)' : 'var(--positive)';
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+function calculateSavingsUpTo(targetPaycheckDate) {
+    const savingsTracker = {};
+    monthlyBillsData.forEach(bill => {
+        if (bill.saveTillDue) {
+            savingsTracker[bill.name] = { current: 0, total: parseBillAmount(bill.amount) };
+        }
+    });
+
+    const sortedChecks = [...budgetData].sort((a, b) => parsePaycheckDate(a.date) - parsePaycheckDate(b.date));
+    
+    const checksToProcess = sortedChecks.filter(p => parsePaycheckDate(p.date) < targetPaycheckDate);
+
+    for (let i = 0; i < checksToProcess.length; i++) {
+        const cardData = checksToProcess[i];
+        const currentPaycheckDate = parsePaycheckDate(cardData.date);
+        
+        if (i > 0) {
+            const lastPaycheckDate = parsePaycheckDate(checksToProcess[i - 1].date);
+            Object.keys(savingsTracker).forEach(billName => {
+                const billInfo = monthlyBillsData.find(b => b.name === billName);
+                if (!billInfo) return;
+                let iterDate = new Date(lastPaycheckDate.getTime());
+                iterDate.setDate(iterDate.getDate() + 1);
+                while (iterDate <= currentPaycheckDate) {
+                    if (iterDate.getDate() === parseInt(billInfo.dueDate, 10)) {
+                        savingsTracker[billName].current = 0;
+                        break;
+                    }
+                    iterDate.setDate(iterDate.getDate() + 1);
+                }
+            });
+        }
+
+        (cardData.expenses || []).forEach(expense => {
+            const tracker = savingsTracker[expense.name];
+            if (tracker && !expense.ignoreSavings) {
+                tracker.current += expense.amount;
+            }
+        });
+    }
+    
+    return savingsTracker;
+}
+
+function updateBalanceDifference() {
+    const projectedText = projectedBalanceDisplay.textContent || '$0';
+    const projectedBalance = parseFloat(projectedText.replace(/[^0-9.-]/g, ''));
+    
+    const actualBalance = parseFloat(actualBalanceInput.value) || 0;
+    
+    const difference = actualBalance - projectedBalance;
+    
+    balanceDifferenceDisplay.textContent = `$${difference.toFixed(2)}`;
+    
+    balanceDifferenceDisplay.classList.remove('difference-good', 'difference-bad');
+    if (Math.abs(difference) < 0.01) {
+	
+    } else if (difference > 0) {
+        balanceDifferenceDisplay.classList.add('difference-good');
+    } else {
+        balanceDifferenceDisplay.classList.add('difference-bad');
+    }
+}
+
+function calculateAndDisplayProjectedBalance() {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    const pastAndPresentChecks = budgetData.filter(p => {
+        const pDate = parsePaycheckDate(p.date);
+        return pDate && pDate <= today;
+    });
+
+    let projectedBalance = 0;
+    pastAndPresentChecks.forEach((check, index) => {
+        projectedBalance += calculatePaycheckBalance(check, index);
+    });
+
+    projectedBalanceDisplay.textContent = `$${projectedBalance.toFixed(2)}`;
+    projectedBalanceDisplay.classList.toggle('negative', projectedBalance < 0);
+    
+    updateBalanceDifference();
+}
+
+function calculateMonthlySpending() {
+    const spending = {};
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    categoriesData.forEach(cat => {
+        spending[cat.name] = 0;
+    });
+
+    budgetData.forEach(paycheck => {
+        const pDate = parsePaycheckDate(paycheck.date);
+        if (pDate && pDate.getMonth() === currentMonth && pDate.getFullYear() === currentYear) {
+            paycheck.expenses.forEach(expense => {
+                const category = expenseCategoryMap[expense.name.toLowerCase()];
+                if (category && spending.hasOwnProperty(category)) {
+                    spending[category] += expense.amount;
+                }
+            });
+        }
+    });
+    return spending;
+}
+
+function showBudgetModal(categoryId) {
+    const category = categoriesData.find(c => c.id === categoryId);
+    if (!category) return;
+    
+    modalTitle.textContent = `Budget for "${category.name}"`;
+    modalBudgetAmount.value = category.budget || '';
+    budgetModal.dataset.editingId = categoryId;
+    
+    const monthlySpending = calculateMonthlySpending();
+    const spent = monthlySpending[category.name] || 0;
+    const budget = category.budget || 0;
+    
+    budgetModal.dataset.currentSpent = spent;
+
+    let percentage = 0;
+    if (budget > 0) {
+        percentage = (spent / budget) * 100;
+    }
+
+    let progressColor = 'var(--positive)';
+    if (spent > budget && budget > 0) {
+        progressColor = 'var(--negative)';
+    } else if (percentage > 80) {
+        progressColor = '#fca311';
+    }
+
+    const circleChart = document.getElementById('modal-circle-chart');
+    circleChart.style.background = `conic-gradient(${progressColor} ${percentage}%, var(--bg-subtle) ${percentage}%)`;
+    
+    const circleText = document.getElementById('modal-circle-text');
+    circleText.innerHTML = `$${spent.toFixed(2)} <br>of $${budget.toFixed(2)}`;
+
+    renderTransactionsInModal(category.name);
+    
+    budgetModal.classList.remove('modal-hidden');
+    modalBudgetAmount.focus();
+}
+
+function hideBudgetModal() {
+    budgetModal.classList.add('modal-hidden');
+}
+
+
+// --- CORE LOGIC & RENDER FUNCTIONS ---
+
+function generateBudgetInsights() {
+    const insights = [];
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let totalIncome = 0;
+    const categoryAnalysis = {};
+    const savingsAnalysis = {}; 
+
+    categoriesData.forEach(cat => {
+        categoryAnalysis[cat.name] = { spent: 0, budget: cat.budget || 0, count: 0, isDefault: cat.isDefault };
+    });
+    savingsGoalsData.forEach(goal => {
+        savingsAnalysis[goal.name] = { contributed: 0 };
+    });
+
+    budgetData.forEach(paycheck => {
+        const pDate = parsePaycheckDate(paycheck.date);
+        if (pDate && pDate.getMonth() === currentMonth && pDate.getFullYear() === currentYear) {
+            totalIncome += paycheck.baseNetPay + (paycheck.income || []).reduce((sum, item) => sum + item.amount, 0);
+            paycheck.expenses.forEach(expense => {
+                const expenseNameLower = expense.name.toLowerCase();
+                const categoryName = expenseCategoryMap[expenseNameLower];
+                
+                if (savingsAnalysis[expense.name]) {
+                     savingsAnalysis[expense.name].contributed += expense.amount;
+                } 
+                else if (categoryName && categoryAnalysis[categoryName]) {
+                    categoryAnalysis[categoryName].spent += expense.amount;
+                    categoryAnalysis[categoryName].count++;
+                }
+            });
+        }
+    });
+
+    for (const categoryName in categoryAnalysis) {
+        const { spent, budget, count, isDefault } = categoryAnalysis[categoryName];
+        
+        if (budget > 0 && spent > budget) {
+            const overage = spent - budget;
+            let tip = '';
+            switch (categoryName) {
+                case 'Groceries': tip = `Consider meal planning or using coupons to stay on track.`; break;
+                case 'Dining Out': tip = `Packing lunch or brewing coffee at home can make a big difference.`; break;
+                case 'Transportation': tip = `Try combining errands into fewer trips to save on fuel.`; break;
+                case 'Entertainment': tip = `Look for free local events or have a movie night at home.`; break;
+                case 'Shopping': tip = `Try the "30-day rule" for non-essential items to curb impulse buys.`; break;
+                case 'Subscriptions': tip = `It might be time to audit recurring charges for any you no longer use.`; break;
+                default: tip = `It might be a good time to review spending in this area.`; break;
+            }
+            insights.push(`<strong>${categoryName}:</strong> You've exceeded your budget by <strong>$${overage.toFixed(2)}</strong>. ${tip}`);
+        } 
+
+        else if (budget > 0 && (spent / budget) >= 0.8) {
+            const remaining = budget - spent;
+            let tip = '';
+             switch (categoryName) {
+                case 'Groceries': tip = `You have <strong>$${remaining.toFixed(2)}</strong> left. Time to look for deals for the rest of the month!`; break;
+                case 'Dining Out': tip = `With only <strong>$${remaining.toFixed(2)}</strong> left, maybe a home-cooked meal next?`; break;
+                case 'Transportation': tip = `You're nearing your transportation budget, with <strong>$${remaining.toFixed(2)}</strong> left.`; break;
+                case 'Entertainment': tip = `Your entertainment budget is getting low, with <strong>$${remaining.toFixed(2)}</strong> remaining.`; break;
+                case 'Shopping': tip = `Be mindful of your shopping, you have <strong>$${remaining.toFixed(2)}</strong> left in the budget.`; break;
+                default: tip = `You have <strong>$${remaining.toFixed(2)}</strong> left in your budget.`; break;
+            }
+            insights.push(`<strong>${categoryName}:</strong> ${tip}`);
+        }
+
+        else if (totalIncome > 0) {
+             if (categoryName === 'Groceries' && (spent / totalIncome) > 0.25) {
+                insights.push(`<strong>Groceries:</strong> Your grocery spending is a significant portion of your income. Using a shopping list can help manage costs.`);
+             }
+             if (categoryName === 'Dining Out' && count > 10) {
+                insights.push(`<strong>Dining Out:</strong> You've dined out ${count} times this month, which can add up quickly. Cooking at home is a great way to save.`);
+             }
+        }
+    }
+
+    let totalSavedThisMonth = 0;
+    Object.values(savingsAnalysis).forEach(goal => totalSavedThisMonth += goal.contributed);
+    if (totalSavedThisMonth > 0) {
+        insights.push(`<strong>Savings:</strong> Great job! You've contributed <strong>$${totalSavedThisMonth.toFixed(2)}</strong> to your savings goals this month. Keep up the momentum!`);
+    } else {
+        insights.push(`<strong>Savings:</strong> You haven't made any contributions to your savings goals this month. Remember, even a small amount can make a big difference over time.`);
+    }
+
+    const projectedBalance = parseFloat((projectedBalanceDisplay.textContent || '$0').replace(/[^0-9.-]/g, ''));
+    const actualBalance = parseFloat(actualBalanceInput.value) || 0;
+    const difference = actualBalance - projectedBalance;
+    if (actualBalance > 0 && difference < -10) {
+        insights.push(`<strong>Balance Check:</strong> Your actual balance is <strong>$${Math.abs(difference).toFixed(2)}</strong> lower than projected. Have you forgotten to enter any small cash purchases or recent transactions?`);
+    }
+    if (actualBalance > 0 && difference > 10) {
+        insights.push(`<strong>Balance Check:</strong> Your actual balance is <strong>$${difference.toFixed(2)}</strong> higher than projected. This could be from a returned item or a bill that was lower than expected. It's a great opportunity to move that extra cash to a savings goal!`);
+    }
+
+    if (insights.length > 0) {
+        insightsContainer.innerHTML = `<ul class="insights-list">${insights.map(tip => `<li>${tip}</li>`).join('')}</ul>`;
+    } else {
+        insightsContainer.innerHTML = `<p class="no-insights">Your budget looks well-balanced this month. Keep up the great work!</p>`;
+    }
+}
+
+function renderCategoryManagement() {
+    const monthlySpending = calculateMonthlySpending();
+    categoryList.innerHTML = '';
+
+    categoriesData.forEach(cat => {
+        const pill = document.createElement('div');
+        pill.className = 'category-pill';
+        pill.dataset.catId = cat.id;
+        
+        const spent = monthlySpending[cat.name] || 0;
+        const budget = cat.budget || 0;
+        let percentage = 0;
+        if (budget > 0) {
+            percentage = Math.min((spent / budget) * 100, 100); 
+        }
+
+        let progressColor = 'var(--positive)';
+        if (spent > budget && budget > 0) {
+            progressColor = 'var(--negative)';
+        } else if (percentage > 80) {
+            progressColor = '#fca311'; 
+        }
+        
+        const deleteButtonHTML = !cat.isDefault 
+            ? `<button class="delete-category" data-cat-id="${cat.id}" title="Delete Category">x</button>` 
+            : '';
+
+        pill.innerHTML = `
+            <div class="category-pill-progress" style="width: ${percentage}%; background-color: ${progressColor};"></div>
+            <div class="category-pill-label">
+                <span>${cat.name}</span>
+                ${deleteButtonHTML}
+            </div>
+        `;
+        categoryList.appendChild(pill);
+    });
+}
+
+
+function renderSavingsGoals() {
+    savingsGrid.innerHTML = '';
+    
+    const savingsTotals = {};
+    savingsGoalsData.forEach(goal => {
+        savingsTotals[goal.name] = 0;
+    });
+
+    budgetData.forEach(paycheck => {
+        (paycheck.expenses || []).forEach(expense => {
+            if (savingsTotals.hasOwnProperty(expense.name)) {
+                savingsTotals[expense.name] += expense.amount;
+            }
+        });
+    });
+
+    savingsGoalsData.forEach(goal => {
+        const currentAmount = savingsTotals[goal.name] || 0;
+        const percentage = goal.goal > 0 ? (currentAmount / goal.goal) * 100 : 0;
+        
+        const card = document.createElement('div');
+        card.className = 'savings-card';
+        card.dataset.goalId = goal.id;
+        
+        card.innerHTML = `
+            <a href="#" class="delete-item">[x]</a>
+            <h5 contenteditable="true" data-field="name">${goal.name}</h5>
+            <div class="savings-progress-bar">
+                <div class="savings-progress-bar-fill" style="width: ${Math.min(percentage, 100)}%;">
+                    ${percentage.toFixed(0)}%
+                </div>
+            </div>
+            <div class="savings-progress-text">$${currentAmount.toFixed(2)} / $${goal.goal.toFixed(2)}</div>
+            <div class="savings-card-footer">
+                <label for="goal-amount-${goal.id}">Goal:</label>
+                <input type="number" id="goal-amount-${goal.id}" data-field="goal" value="${goal.goal.toFixed(2)}" step="10">
+            </div>
+        `;
+        savingsGrid.appendChild(card);
+    });
+}
+
+
+function calculatePaycheckBalance(paycheckData, index) {
+    const prevAdvance = (appSettings.isPaydayAdvanceEnabled && index > 0) ? budgetData[index - 1].instantCo : 0;
+    const adjustedNetPay = paycheckData.baseNetPay - prevAdvance;
+    const currentAdvance = appSettings.isPaydayAdvanceEnabled ? paycheckData.instantCo : 0;
+    const totalExtraIncome = (paycheckData.income || []).reduce((sum, item) => sum + item.amount, 0);
+    const totalAvailable = adjustedNetPay + currentAdvance + totalExtraIncome;
+    const totalExpenses = (paycheckData.expenses || []).reduce((sum, item) => sum + item.amount, 0);
+    return totalAvailable - totalExpenses;
+}
+
+function renderTransactionsInModal(categoryName, page = 1) {
+    modalCurrentPage = page;
+    const listEl = document.getElementById('modal-transaction-list');
+    const pageInfoEl = document.getElementById('modal-page-info');
+    const prevBtn = document.getElementById('modal-prev-page');
+    const nextBtn = document.getElementById('modal-next-page');
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const transactions = [];
+
+    budgetData.forEach(paycheck => {
+        const pDate = parsePaycheckDate(paycheck.date);
+        if (pDate && pDate.getMonth() === currentMonth && pDate.getFullYear() === currentYear) {
+            paycheck.expenses.forEach(expense => {
+                if (expenseCategoryMap[expense.name.toLowerCase()] === categoryName) {
+                    transactions.push({
+                        date: paycheck.date,
+                        isoDate: pDate.toISOString().slice(0, 10),
+                        amount: expense.amount
+                    });
+                }
+            });
+        }
+    });
+
+    listEl.innerHTML = '';
+    if (transactions.length === 0) {
+        listEl.innerHTML = `<p style="text-align:center; color: var(--text-secondary);">No transactions this month.</p>`;
+        document.getElementById('modal-pagination-controls').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('modal-pagination-controls').style.display = 'flex';
+    const totalPages = Math.ceil(transactions.length / MODAL_ITEMS_PER_PAGE);
+    pageInfoEl.textContent = `Page ${modalCurrentPage} of ${totalPages}`;
+    prevBtn.disabled = modalCurrentPage === 1;
+    nextBtn.disabled = modalCurrentPage === totalPages;
+
+    const startIndex = (modalCurrentPage - 1) * MODAL_ITEMS_PER_PAGE;
+    const endIndex = startIndex + MODAL_ITEMS_PER_PAGE;
+    const pageItems = transactions.slice(startIndex, endIndex);
+
+    pageItems.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'transaction-item';
+        itemEl.dataset.date = item.isoDate;
+        itemEl.innerHTML = `<span>${item.date.replace('Paycheck - ', '')}</span> <span>$${item.amount.toFixed(2)}</span>`;
+        listEl.appendChild(itemEl);
+    });
+}
+
+
+function getPaychecksToDisplay() {
+    let dataToDisplay = [...budgetData];
+    if (currentSearchDate) {
+        dataToDisplay = dataToDisplay.filter(p => {
+            const pDate = parsePaycheckDate(p.date);
+            return pDate && pDate.toISOString().slice(0, 10) === currentSearchDate;
+        });
+    }
+    const sortValue = appSettings.sortPreference;
+    if (sortValue !== 'default') {
+        dataToDisplay.sort((a, b) => {
+            switch (sortValue) {
+                case 'date-asc': return parsePaycheckDate(a.date) - parsePaycheckDate(b.date);
+                case 'date-desc': return parsePaycheckDate(b.date) - parsePaycheckDate(a.date);
+                case 'balance-asc': return calculatePaycheckBalance(a, budgetData.indexOf(a)) - calculatePaycheckBalance(b, budgetData.indexOf(b));
+                case 'balance-desc': return calculatePaycheckBalance(b, budgetData.indexOf(b)) - calculatePaycheckBalance(a, budgetData.indexOf(a));
+                default: return 0;
+            }
+        });
+    }
+    return dataToDisplay;
+}
+
+function renderBillsTable() {
+    const tbody = billsTable.querySelector('tbody');
+    tbody.innerHTML = '';
+    monthlyBillsData.forEach((bill, index) => {
+        const row = tbody.insertRow();
+        row.dataset.index = index;
+        row.innerHTML = `
+            <td><a href="#" class="delete-item">[x]</a></td>
+            <td contenteditable="true" data-field="name">${bill.name}</td>
+            <td contenteditable="true" data-field="amount">${bill.amount}</td>
+            <td><input type="number" min="1" max="31" value="${bill.dueDate}" data-field="dueDate" class="item-amount-input"></td>
+            <td><input type="checkbox" ${bill.saveTillDue ? 'checked' : ''} data-field="saveTillDue"></td>
+            <td contenteditable="true" data-field="notes">${bill.notes}</td>
+        `;
+    });
+}
+
+function renderPaycheckCards() {
+    grid.innerHTML = '';
+    const paychecksToRender = getPaychecksToDisplay();
+
+    if (paychecksToRender.length === 0) {
+        grid.innerHTML = `<p style="text-align:center; color: var(--text-secondary);">No paychecks found.</p>`;
+        recalculateAll();
+        applyPagination(0);
+        return;
+    }
+
+    const createItemHTML = (item, index, type) => {
+        const isChecked = item.ignoreSavings ? 'checked' : '';
+        const itemNameLower = item.name.toLowerCase();
+        const isBill = monthlyBillsData.some(b => b.name.toLowerCase() === itemNameLower);
+        const isSaving = savingsGoalsData.some(s => s.name.toLowerCase() === itemNameLower);
+        
+        let categoryHTML = '';
+        if (type === 'expense' && item.name && !isBill && !isSaving) {
+            const assignedCategory = expenseCategoryMap[itemNameLower];
+            if (assignedCategory) {
+                categoryHTML = `<button class="item-category-pill" data-expense-name="${item.name}" title="Click to change category">${assignedCategory}</button>`;
+            } else {
+                const categoryTags = categoriesData.map(cat => 
+                    `<button class="category-choice-pill" data-expense-name="${item.name}" data-category-name="${cat.name}">${cat.name}</button>`
+                ).join('');
+                categoryHTML = `<div class="category-choices-container">${categoryTags}</div>`;
+            }
+        }
+        
+        const cumulativeHTML = `<div class="cumulative-wrapper">
+                                    <input type="checkbox" class="dont-add-to-savings" title="Don't add this amount to the 'Save Till Due' total for this bill" ${isChecked}>
+                                    <span class="cumulative-display"></span>
+                                </div>`;
+
+        return `
+            <div class="${type}-item" data-item-index="${index}">
+                <div class="item-main-row">
+                    <a href="#" class="delete-item">[x]</a>
+                    <div class="item-name-container">
+                        <input type="text" class="item-name-input" value="${item.name}" autocomplete="off">
+                    </div>
+                    <input type="number" class="item-amount-input ${type}" value="${item.amount.toFixed(2)}" step="0.01">
+                </div>
+                <div class="item-secondary-row">
+                    ${cumulativeHTML}
+                    ${categoryHTML}
+                </div>
+            </div>`;
+    };
+
+    paychecksToRender.forEach((cardData) => {
+        const card = document.createElement('div');
+        card.className = 'paycheck-card';
+        card.dataset.cardId = cardData.id;
+        if (!cardData.income) cardData.income = [];
+
+        const incomeHTML = cardData.income.map((item, i) => createItemHTML(item, i, 'income')).join('');
+        const expensesHTML = cardData.expenses.map((item, i) => createItemHTML(item, i, 'expense')).join('');
+        
+        card.innerHTML = `
+            <h3><span>${cardData.date}</span><button class="delete-paycheck-btn" title="Delete this paycheck">×</button></h3>
+            <div class="info-item"><span>Base Net Pay</span><input type="number" class="base-net-pay-input" value="${cardData.baseNetPay.toFixed(2)}" step="0.01"></div>
+            <div class="info-item adjusted-pay"><span>Adjusted Net Pay</span><strong class="adjusted-net-pay-display"></strong></div>
+            <div class="info-item advance"><span>Payday Advance</span><input type="number" class="instant-co-input" value="${cardData.instantCo.toFixed(2)}" step="0.01"></div>
+            <div class="info-item"><span><strong>Total Available Funds</strong></span><strong class="total-available-funds-display"></strong></div>
+            <h4>Extra Income</h4>
+            <div class="income-list">${incomeHTML}</div>
+            <button class="add-item-btn income add-income-btn">+ Add Income</button>
+            <h4>Expenses</h4>
+            <div class="expenses-list">${expensesHTML}</div>
+            <button class="add-item-btn add-expense-btn">+ Add Expense</button>
+            <h4>Bills Due This Period</h4>
+            <div class="due-bills-list"></div>
+            <div class="total"><span>Amount Left:</span><span class="amount-left"></span></div>
+        `;
+        grid.appendChild(card);
+        populateDueBills(card, cardData);
+    });
+    recalculateAll();
+    applyPagination(paychecksToRender.length);
+}
+function populateDueBills(cardElement, cardData) {
+    const dueBillsList = cardElement.querySelector('.due-bills-list');
+    dueBillsList.innerHTML = '';
+    const currentPaycheckDate = parsePaycheckDate(cardData.date);
+    if (!currentPaycheckDate) return;
+
+    const savingsBeforeThisPeriod = calculateSavingsUpTo(currentPaycheckDate);
+
+    const originalOrderData = [...budgetData].sort((a, b) => parsePaycheckDate(a.date) - parsePaycheckDate(b.date));
+    const currentIndex = originalOrderData.findIndex(p => p.id === cardData.id);
+
+    let nextPaycheckDate;
+    if (currentIndex > -1 && currentIndex < originalOrderData.length - 1) {
+        nextPaycheckDate = parsePaycheckDate(originalOrderData[currentIndex + 1].date);
+    } else {
+        const daysToAdd = appSettings.payFrequency === 'weekly' ? 7 : 14;
+        nextPaycheckDate = new Date(currentPaycheckDate);
+        nextPaycheckDate.setDate(nextPaycheckDate.getDate() + daysToAdd);
+    }
+
+    const existingExpenseNames = cardData.expenses.map(exp => exp.name);
+
+    monthlyBillsData.forEach(bill => {
+        if (existingExpenseNames.includes(bill.name)) return;
+
+        let isDue = false;
+        let iterDate = new Date(currentPaycheckDate);
+        while (iterDate < nextPaycheckDate) {
+            if (iterDate.getDate() === parseInt(bill.dueDate, 10)) {
+                isDue = true;
+                break;
+            }
+            iterDate.setDate(iterDate.getDate() + 1);
+        }
+
+        if (isDue) {
+            let amountToShow = parseBillAmount(bill.amount);
+            
+            if (bill.saveTillDue && savingsBeforeThisPeriod[bill.name]) {
+                const savedAmount = savingsBeforeThisPeriod[bill.name].current;
+                const totalNeeded = savingsBeforeThisPeriod[bill.name].total;
+                amountToShow = Math.max(0, totalNeeded - savedAmount);
+            }
+
+            const billBtn = document.createElement('button');
+            billBtn.className = 'due-bill-item';
+            if (amountToShow > 0) {
+                billBtn.textContent = `+ ${bill.name} ($${amountToShow.toFixed(2)})`;
+                billBtn.dataset.billName = bill.name;
+                billBtn.dataset.billAmount = amountToShow;
+                dueBillsList.appendChild(billBtn);
+            }
+        }
+    });
+}
+
+function recalculateAll() {
+    const savingsTracker = {};
+    monthlyBillsData.forEach(bill => {
+        if (bill.saveTillDue) {
+            savingsTracker[bill.name] = { current: 0, total: parseBillAmount(bill.amount) };
+        }
+    });
+
+    let negativePaychecks = [];
+    const originalOrderData = [...budgetData].sort((a, b) => parsePaycheckDate(a.date) - parsePaycheckDate(b.date));
+
+    originalOrderData.forEach((cardData, index) => {
+        const currentPaycheckDate = parsePaycheckDate(cardData.date);
+        
+        if (index > 0) {
+            const lastPaycheckDate = parsePaycheckDate(originalOrderData[index - 1].date);
+            if (lastPaycheckDate) {
+                Object.keys(savingsTracker).forEach(billName => {
+                    const billInfo = monthlyBillsData.find(b => b.name === billName);
+                    if (!billInfo) return;
+                    let iterDate = new Date(lastPaycheckDate.getTime());
+                    iterDate.setDate(iterDate.getDate() + 1);
+                    while (iterDate <= currentPaycheckDate) {
+                        if (iterDate.getDate() === parseInt(billInfo.dueDate, 10)) {
+                            savingsTracker[billName].current = 0;
+                            break;
+                        }
+                        iterDate.setDate(iterDate.getDate() + 1);
+                    }
+                });
+            }
+        }
+
+        const prevAdvance = (appSettings.isPaydayAdvanceEnabled && index > 0) ? originalOrderData[index - 1].instantCo : 0;
+        const adjustedNetPay = cardData.baseNetPay - prevAdvance;
+        const currentAdvance = appSettings.isPaydayAdvanceEnabled ? cardData.instantCo : 0;
+        const totalExtraIncome = (cardData.income || []).reduce((sum, item) => sum + item.amount, 0);
+        const totalAvailable = adjustedNetPay + currentAdvance + totalExtraIncome;
+        
+        let totalExpenses = 0;
+        (cardData.expenses || []).forEach(expense => {
+            totalExpenses += expense.amount;
+            const tracker = savingsTracker[expense.name];
+            if (tracker && !expense.ignoreSavings) {
+                tracker.current += expense.amount;
+            }
+        });
+
+        const amountLeft = totalAvailable - totalExpenses;
+        if (amountLeft < 0) {
+            negativePaychecks.push({ card: cardData, amount: amountLeft });
+        }
+
+        const cardOnScreen = grid.querySelector(`[data-card-id="${cardData.id}"]`);
+        if (cardOnScreen) {
+            cardOnScreen.querySelector('.adjusted-net-pay-display').textContent = `$${adjustedNetPay.toFixed(2)}`;
+            cardOnScreen.querySelector('.total-available-funds-display').textContent = `$${totalAvailable.toFixed(2)}`;
+            const amountLeftEl = cardOnScreen.querySelector('.amount-left');
+            amountLeftEl.textContent = `$${amountLeft.toFixed(2)}`;
+            amountLeftEl.className = 'amount-left ' + (amountLeft < 0 ? 'negative' : 'positive');
+
+            cardOnScreen.querySelectorAll('.expense-item, .income-item').forEach(itemEl => {
+                const itemIndex = parseInt(itemEl.dataset.itemIndex, 10);
+                const isExpense = itemEl.classList.contains('expense-item');
+                const itemData = isExpense ? cardData.expenses[itemIndex] : cardData.income[itemIndex];
+                
+                if (itemData) {
+                    const tracker = savingsTracker[itemData.name];
+                    const wrapper = itemEl.querySelector('.cumulative-wrapper');
+                    if (tracker) {
+                        wrapper.style.display = 'flex';
+                        const display = wrapper.querySelector('.cumulative-display');
+                        display.textContent = `(${tracker.current.toFixed(2)} / ${tracker.total.toFixed(2)})`;
+                    } else if (wrapper) {
+                        wrapper.style.display = 'none';
+                    }
+                }
+            });
+        }
+    });
+
+    updateNegativeTicker(negativePaychecks);
+	renderSavingsGoals();
+    calculateAndDisplayProjectedBalance();
+	generateBudgetInsights();
+	renderCategoryManagement();
+}
+function updateNegativeTicker(negativeItems) {
+    if (negativeItems.length > 0) {
+        negativeTickerItems.innerHTML = negativeItems.map(item => {
+            const pDate = parsePaycheckDate(item.card.date);
+            const dateForFilter = pDate ? pDate.toISOString().slice(0, 10) : '';
+            return `<div class="ticker-item" data-date="${dateForFilter}">${item.card.date.replace('Paycheck - ','')}: $${item.amount.toFixed(2)}</div>`;
+        }).join('');
+        negativeTickerContainer.style.display = 'block';
+    } else {
+        negativeTickerContainer.style.display = 'none';
+    }
+}
+
+function applyPagination(totalItems) {
+    const itemsPerPage = (appSettings.itemsPerPage === 'all' || appSettings.itemsPerPage > totalItems) 
+        ? totalItems 
+        : parseInt(appSettings.itemsPerPage, 10);
+    
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfoSpan = document.getElementById('page-info');
+    const paginationControlsDiv = document.getElementById('pagination-controls');
+
+    paginationControlsDiv.style.display = 'flex'; 
+
+    if (itemsPerPage === 0 || totalItems === 0) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        pageInfoSpan.style.display = 'none';
+        return;
+    }
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    currentPage = Math.max(1, Math.min(currentPage, totalPages || 1));
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    const cards = Array.from(grid.querySelectorAll('.paycheck-card'));
+    cards.forEach((card, index) => card.classList.toggle('hidden', index < startIndex || index >= endIndex));
+    
+    if (totalPages > 1) {
+        pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+        
+        prevBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'inline-block';
+        pageInfoSpan.style.display = 'inline-block';
+    } else {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        pageInfoSpan.style.display = 'none';
+    }
+}
+
+function syncUIToData() {
+    grid.querySelectorAll('.paycheck-card').forEach(card => {
+        const cardId = parseInt(card.dataset.cardId, 10);
+        const cardData = budgetData.find(p => p.id === cardId);
+        if (!cardData) return;
+        cardData.baseNetPay = parseBillAmount(card.querySelector('.base-net-pay-input').value);
+        cardData.instantCo = parseBillAmount(card.querySelector('.instant-co-input').value);
+        
+        card.querySelectorAll('.expense-item').forEach(itemEl => {
+            const itemIndex = parseInt(itemEl.dataset.itemIndex, 10);
+            if (cardData.expenses[itemIndex]) {
+                cardData.expenses[itemIndex].name = itemEl.querySelector('.item-name-input').value;
+                cardData.expenses[itemIndex].amount = parseBillAmount(itemEl.querySelector('.item-amount-input').value);
+                cardData.expenses[itemIndex].ignoreSavings = itemEl.querySelector('.dont-add-to-savings').checked;
+            }
+        });
+
+        card.querySelectorAll('.income-item').forEach(itemEl => {
+            const itemIndex = parseInt(itemEl.dataset.itemIndex, 10);
+             if (cardData.income[itemIndex]) {
+                cardData.income[itemIndex].name = itemEl.querySelector('.item-name-input').value;
+                cardData.income[itemIndex].amount = parseBillAmount(itemEl.querySelector('.item-amount-input').value);
+                cardData.income[itemIndex].ignoreSavings = itemEl.querySelector('.dont-add-to-savings').checked;
+            }
+        });
+    });
+}
+
+function saveData(showNotification = true) {
+    try {
+        if (showNotification) syncUIToData();
+        const allData = { 
+            settings: appSettings, 
+            bills: monthlyBillsData, 
+            savings: savingsGoalsData, 
+            categories: categoriesData, 
+            categoryMap: expenseCategoryMap, 
+            budget: budgetData 
+        };
+        localStorage.setItem('budgetPlannerDataDesktopV1.5.0', JSON.stringify(allData));
+        if (showNotification) showToast('Saved successfully!');
+    } catch (error) {
+        console.error('Failed to save data:', error);
+        if (showNotification) showToast('Error saving data.', 'error');
+    }
+}
+
+// --- EVENT LISTENERS ---
+payFrequencySelect.addEventListener('change', (e) => { appSettings.payFrequency = e.target.value; renderPaycheckCards(); });
+enablePaydayAdvanceCheckbox.addEventListener('change', (e) => { appSettings.isPaydayAdvanceEnabled = e.target.checked; budgetContainer.classList.toggle('payday-advance-hidden', !appSettings.isPaydayAdvanceEnabled); recalculateAll(); });
+billsHeader.addEventListener('click', () => {
+    billsContainer.classList.toggle('collapsed');
+    const isCollapsed = billsContainer.classList.contains('collapsed');
+    billsHeader.querySelector('.toggle-arrow').classList.toggle('collapsed', isCollapsed);
+    appSettings.isBillsCollapsed = isCollapsed;
+    saveData(false);
+});
+sortPaychecksSelect.addEventListener('change', (e) => { appSettings.sortPreference = e.target.value; currentPage = 1; renderPaycheckCards(); saveData(false); });
+searchDateInput.addEventListener('input', (e) => { currentSearchDate = e.target.value; currentPage = 1; renderPaycheckCards(); });
+clearSearchBtn.addEventListener('click', () => { searchDateInput.value = ''; currentSearchDate = null; renderPaycheckCards(); });
+negativeTickerContainer.querySelector('h4').addEventListener('click', () => {
+    const content = document.getElementById('negative-ticker-content');
+    content.classList.toggle('collapsed');
+    const isCollapsed = content.classList.contains('collapsed');
+    negativeTickerContainer.querySelector('.toggle-arrow').classList.toggle('collapsed', isCollapsed);
+    appSettings.isTickerCollapsed = isCollapsed;
+    saveData(false);
+});
+negativeTickerItems.addEventListener('click', e => {
+    if (e.target.classList.contains('ticker-item')) {
+        const dateToFilter = e.target.dataset.date;
+        if (dateToFilter) {
+            searchDateInput.value = dateToFilter;
+            searchDateInput.dispatchEvent(new Event('input', { bubbles: true }));
+            const clickedCardData = budgetData.find(p => {
+                const pDate = parsePaycheckDate(p.date);
+                return pDate && pDate.toISOString().slice(0, 10) === dateToFilter;
+            });
+            if (clickedCardData) {
+                 setTimeout(() => {
+                    const cardElement = grid.querySelector(`[data-card-id="${clickedCardData.id}"]`);
+                    if (cardElement) cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 }, 100);
+            }
+        }
+    }
+});
+savingsHeader.addEventListener('click', () => {
+    savingsContainer.classList.toggle('collapsed');
+    const isCollapsed = savingsContainer.classList.contains('collapsed');
+    savingsHeader.querySelector('.toggle-arrow').classList.toggle('collapsed', isCollapsed);
+    appSettings.isSavingsCollapsed = isCollapsed;
+    saveData(false);
+});
+
+paychecksHeader.addEventListener('click', () => {
+    paychecksContainer.classList.toggle('collapsed');
+    const isCollapsed = paychecksContainer.classList.contains('collapsed');
+    paychecksHeader.querySelector('.toggle-arrow').classList.toggle('collapsed', isCollapsed);
+    appSettings.isPaychecksCollapsed = isCollapsed;
+    saveData(false);
+});
+
+addSavingsGoalBtn.addEventListener('click', () => {
+    savingsGoalsData.push({ id: Date.now(), name: 'New Savings Goal', goal: 500 });
+    renderSavingsGoals();
+});
+
+savingsGrid.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-item')) {
+        e.preventDefault();
+        const card = e.target.closest('.savings-card');
+        const goalId = parseInt(card.dataset.goalId, 10);
+        savingsGoalsData = savingsGoalsData.filter(g => g.id !== goalId);
+        renderSavingsGoals();
+    }
+});
+
+savingsGrid.addEventListener('input', e => {
+    const card = e.target.closest('.savings-card');
+    if (!card) return;
+    const goalId = parseInt(card.dataset.goalId, 10);
+    const goal = savingsGoalsData.find(g => g.id === goalId);
+    if (!goal) return;
+
+    const field = e.target.dataset.field;
+    if (field === 'name') {
+        goal.name = e.target.textContent;
+    } else if (field === 'goal') {
+        goal.goal = parseFloat(e.target.value) || 0;
+    }
+    setTimeout(renderSavingsGoals, 300);
+});
+
+billsTable.addEventListener('input', e => {
+    if (e.target.closest('tr')) {
+        const rowIndex = e.target.closest('tr').dataset.index;
+        const field = e.target.dataset.field;
+        if (rowIndex && field) {
+            const value = e.target.type === 'checkbox' ? e.target.checked : (e.target.isContentEditable ? e.target.textContent : e.target.value);
+            monthlyBillsData[rowIndex][field] = value;
+        }
+    }
+});
+
+billsTable.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-item')) {
+        e.preventDefault();
+        const rowIndex = e.target.closest('tr').dataset.index;
+        monthlyBillsData.splice(rowIndex, 1);
+        renderBillsTable();
+        recalculateAll();
+    }
+});
+
+addBillBtn.addEventListener('click', () => { monthlyBillsData.push({ name: 'New Bill', amount: '$0.00', dueDate: 1, saveTillDue: false, notes: '' }); renderBillsTable(); });
+
+grid.addEventListener('input', e => { syncUIToData(); recalculateAll(); });
+
+grid.addEventListener('click', e => {
+    const card = e.target.closest('.paycheck-card');
+    if (!card) return;
+    const cardId = parseInt(card.dataset.cardId, 10);
+    const cardData = budgetData.find(p => p.id === cardId);
+    if (!cardData) return;
+   if (e.target.classList.contains('item-category-pill')) {
+        const expenseName = e.target.dataset.expenseName.toLowerCase();
+        
+        delete expenseCategoryMap[expenseName];
+        
+        renderPaycheckCards();
+        saveData(false);
+        return;
+    }
+	if (e.target.classList.contains('category-choice-pill')) {
+        const expenseName = e.target.dataset.expenseName.toLowerCase();
+        const categoryName = e.target.dataset.categoryName;
+        
+        expenseCategoryMap[expenseName] = categoryName;
+
+        renderPaycheckCards();
+        saveData(false);
+        return;
+    }
+    if (e.target.classList.contains('delete-paycheck-btn')) {
+        if (confirm('Are you sure you want to delete this entire paycheck?')) {
+            const indexToDelete = budgetData.findIndex(p => p.id === cardId);
+            if (indexToDelete > -1) { budgetData.splice(indexToDelete, 1); renderPaycheckCards(); }
+        }
+    }
+    if (e.target.classList.contains('add-expense-btn')) { 
+        syncUIToData();
+        cardData.expenses.push({ name: '', amount: 0, ignoreSavings: false }); 
+        renderPaycheckCards(); 
+    }
+    if (e.target.classList.contains('add-income-btn')) { 
+        syncUIToData();
+        cardData.income.push({ name: 'Extra Income', amount: 0, ignoreSavings: false }); 
+        renderPaycheckCards(); 
+    }
+    if (e.target.classList.contains('delete-item')) {
+        e.preventDefault();
+        syncUIToData();
+        const item = e.target.closest('[data-item-index]');
+        const itemIndex = item.dataset.itemIndex;
+        if (item.classList.contains('expense-item')) cardData.expenses.splice(itemIndex, 1);
+        else if (item.classList.contains('income-item')) cardData.income.splice(itemIndex, 1);
+        renderPaycheckCards();
+    }
+    if (e.target.classList.contains('due-bill-item')) {
+        syncUIToData();
+        const billName = e.target.dataset.billName;
+        const billAmount = parseFloat(e.target.dataset.billAmount);
+        cardData.expenses.push({ name: billName, amount: billAmount, ignoreSavings: false });
+        renderPaycheckCards();
+        showToast(`${billName} added to expenses.`);
+    }
+});
+
+grid.addEventListener('keyup', e => {
+    if (e.target.classList.contains('item-name-input')) {
+        currentAutocompleteInput = e.target;
+        const value = e.target.value.toLowerCase();
+        const container = e.target.closest('.item-name-container');
+        
+        document.querySelectorAll('.autocomplete-suggestions').forEach(list => {
+            if (list.parentNode !== container) {
+                list.parentNode.removeChild(list);
+            }
+        });
+        
+        let suggestions = container.querySelector('.autocomplete-suggestions');
+        if (suggestions) {
+            suggestions.innerHTML = '';
+        } else {
+            suggestions = document.createElement('div');
+            suggestions.setAttribute('class', 'autocomplete-suggestions');
+            container.appendChild(suggestions);
+        }
+
+        if (!value) {
+            suggestions.parentNode.removeChild(suggestions);
+            return;
+        }
+
+	   const billSuggestions = monthlyBillsData.map(b => ({name: b.name, amount: b.amount}));
+			const savingsSuggestions = savingsGoalsData.map(s => ({name: s.name, amount: 'Contribution'}));
+			const allSuggestions = [...billSuggestions, ...savingsSuggestions];
+
+			allSuggestions.filter(item => item.name.toLowerCase().includes(value)).forEach(item => {
+				const suggestionEl = document.createElement('div');
+				suggestionEl.innerHTML = `<span class="suggestion-name">${item.name}</span> <span class="suggestion-amount">${item.amount}</span>`;
+				suggestionEl.addEventListener('click', () => {
+					e.target.value = item.name;
+					if (typeof item.amount === 'string' && item.amount.startsWith('$')) {
+						 e.target.closest('.expense-item, .income-item').querySelector('.item-amount-input').value = parseBillAmount(item.amount).toFixed(2);
+					}
+					document.querySelectorAll('.autocomplete-suggestions').forEach(list => list.parentNode.removeChild(list));
+					syncUIToData();
+					recalculateAll();
+				});
+				suggestions.appendChild(suggestionEl);
+			});
+    }
+});
+
+document.addEventListener("click", e => {
+    if (e.target !== currentAutocompleteInput && !e.target.closest('.autocomplete-suggestions')) {
+        document.querySelectorAll('.autocomplete-suggestions').forEach(list => list.parentNode.removeChild(list));
+    }
+});
+
+addPaycheckBtn.addEventListener('click', () => {
+    const dateInput = document.getElementById('new-paycheck-date');
+    const amountInput = document.getElementById('new-paycheck-amount');
+    if (!dateInput.value) { showToast('Please select a date.', 'error'); return; }
+    const dateObj = new Date(dateInput.value + 'T12:00:00');
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const formattedDate = `Paycheck - ${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}`;
+    const newPaycheck = { id: Date.now(), date: formattedDate, baseNetPay: parseFloat(amountInput.value) || 0, instantCo: 0, expenses: [], income: [] };
+    budgetData.push(newPaycheck);
+    const sortedData = getPaychecksToDisplay();
+    const newIndexInSortedView = sortedData.findIndex(p => p.id === newPaycheck.id);
+    currentPage = Math.ceil((newIndexInSortedView + 1) / (appSettings.itemsPerPage === 'all' ? budgetData.length : appSettings.itemsPerPage));
+    renderPaycheckCards();
+    dateInput.value = '';
+    amountInput.value = '';
+    showToast('Paycheck added successfully!');
+});
+
+prevPageBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; applyPagination(getPaychecksToDisplay().length); } });
+nextPageBtn.addEventListener('click', () => {
+    const totalItems = getPaychecksToDisplay().length;
+    const itemsPerPage = (appSettings.itemsPerPage === 'all' || appSettings.itemsPerPage > totalItems) 
+        ? totalItems 
+        : parseInt(appSettings.itemsPerPage, 10);
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (currentPage < totalPages) {
+        currentPage++;
+        applyPagination(totalItems);
+    }
+});
+
+saveBtn.addEventListener('click', () => saveData(true));
+
+resetBtn.addEventListener('click', () => { if (confirm('Are you sure?')) { localStorage.removeItem('budgetPlannerDataDesktopV1.5.0'); location.reload(); } });
+
+clearAllBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all data and reset categories to default? This will not be saved until you click the "Save" button.')) {
+        monthlyBillsData = [];
+        savingsGoalsData = [];
+        budgetData = [];
+
+        categoriesData = [...DEFAULT_CATEGORIES];
+        expenseCategoryMap = {};
+
+        actualBalanceInput.value = '';
+        appSettings.actualBalance = '';
+
+        renderBillsTable();
+        renderSavingsGoals();
+        renderCategoryManagement();
+        renderPaycheckCards();
+
+        showToast('All data cleared and categories reset.');
+    }
+});
+
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    themeToggle.innerHTML = isDarkMode ? '&#9728;&#65039;' : '&#127765;';
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+});
+
+itemsPerPageSelect.addEventListener('change', (e) => {
+    appSettings.itemsPerPage = e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10);
+    currentPage = 1;
+    renderPaycheckCards();
+    saveData(false);
+});
+
+window.addEventListener('scroll', () => {
+    if (controlsPanel.getBoundingClientRect().top < 0) {
+        saveBtn.classList.add('sticky');
+    } else {
+        saveBtn.classList.remove('sticky');
+    }
+});
+
+insightsHeader.addEventListener('click', () => {
+    insightsContainer.classList.toggle('collapsed');
+    const isCollapsed = insightsContainer.classList.contains('collapsed');
+    insightsHeader.querySelector('.toggle-arrow').classList.toggle('collapsed', isCollapsed);
+    appSettings.isInsightsCollapsed = isCollapsed;
+    saveData(false);
+});
+
+categoriesHeader.addEventListener('click', () => {
+    categoriesContainer.classList.toggle('collapsed');
+    const isCollapsed = categoriesContainer.classList.contains('collapsed');
+    categoriesHeader.querySelector('.toggle-arrow').classList.toggle('collapsed', isCollapsed);
+    appSettings.isCategoriesCollapsed = isCollapsed;
+    saveData(false);
+});
+
+addCategoryBtn.addEventListener('click', () => {
+    if (categoriesData.length >= 12) {
+        showToast('You have reached the maximum of 12 categories.', 'error');
+        return;
+    }
+    const name = newCategoryInput.value.trim();
+    if (name && !categoriesData.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        const newCategory = { id: Date.now(), name: name, budget: 0 };
+        categoriesData.push(newCategory);
+        saveData(false);
+        newCategoryInput.value = '';
+        renderCategoryManagement();
+        renderPaycheckCards();
+        showBudgetModal(newCategory.id);
+    }
+});
+
+addCategoryBtn.addEventListener('click', () => {
+    if (categoriesData.length >= 12) {
+        showToast('You have reached the maximum of 12 categories.', 'error');
+        return;
+    }
+    const name = newCategoryInput.value.trim();
+    if (name && !categoriesData.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        const newCategory = { id: Date.now(), name: name, budget: 0 };
+        categoriesData.push(newCategory);
+        saveData(false);
+        newCategoryInput.value = '';
+        renderCategoryManagement();
+        renderPaycheckCards();
+        showBudgetModal(newCategory.id);
+    }
+});
+
+grid.addEventListener('change', e => {
+    if (e.target.classList.contains('categorize-select')) {
+        const expenseName = e.target.dataset.expenseName.toLowerCase();
+        const category = e.target.value;
+        if (expenseName && category) {
+            expenseCategoryMap[expenseName] = category;
+            renderPaycheckCards();
+        }
+    }
+});
+
+
+categoryList.addEventListener('click', e => {
+    const pill = e.target.closest('.category-pill');
+    if (!pill) return;
+
+    const catId = parseInt(pill.dataset.catId, 10);
+
+    if (e.target.classList.contains('delete-category')) {
+        categoriesData = categoriesData.filter(c => c.id !== catId);
+        saveData(false);
+        renderCategoryManagement();
+        renderPaycheckCards();
+    } else {
+        showBudgetModal(catId);
+    }
+});
+
+newCategoryInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        e.preventDefault(); 
+        addCategoryBtn.click();
+    }
+});
+
+modalSaveBtn.addEventListener('click', () => {
+    const categoryId = parseInt(budgetModal.dataset.editingId, 10);
+    const category = categoriesData.find(c => c.id === categoryId);
+    if (category) {
+        category.budget = parseFloat(modalBudgetAmount.value) || 0;
+        saveData(false);
+        renderCategoryManagement();
+		generateBudgetInsights();
+    }
+});
+
+modalCancelBtn.addEventListener('click', hideBudgetModal);
+budgetModal.addEventListener('click', e => {
+    if (e.target === budgetModal) {
+        hideBudgetModal();
+    }
+});
+
+modalBudgetAmount.addEventListener('input', () => {
+    const spent = parseFloat(budgetModal.dataset.currentSpent) || 0;
+    const newBudget = parseFloat(modalBudgetAmount.value) || 0;
+
+    let percentage = 0;
+    if (newBudget > 0) {
+        percentage = (spent / newBudget) * 100;
+    }
+    
+    let progressColor = 'var(--positive)';
+    if (spent > newBudget && newBudget > 0) {
+        progressColor = 'var(--negative)';
+    } else if (percentage > 80) {
+        progressColor = '#fca311';
+    }
+
+    const circleChart = document.getElementById('modal-circle-chart');
+    circleChart.style.background = `conic-gradient(${progressColor} ${percentage}%, var(--bg-subtle) ${percentage}%)`;
+
+    const circleText = document.getElementById('modal-circle-text');
+    circleText.innerHTML = `$${spent.toFixed(2)} <br>of $${newBudget.toFixed(2)}`;
+});
+actualBalanceInput.addEventListener('input', () => {
+    updateBalanceDifference();
+	generateBudgetInsights();
+    appSettings.actualBalance = actualBalanceInput.value;
+    saveData(false);
+});
+
+modalPrevPage.addEventListener('click', () => {
+    const categoryId = parseInt(budgetModal.dataset.editingId, 10);
+    const category = categoriesData.find(c => c.id === categoryId);
+    if (category && modalCurrentPage > 1) {
+        renderTransactionsInModal(category.name, modalCurrentPage - 1);
+    }
+});
+
+modalNextPage.addEventListener('click', () => {
+    const categoryId = parseInt(budgetModal.dataset.editingId, 10);
+    const category = categoriesData.find(c => c.id === categoryId);
+    if (category) {
+        renderTransactionsInModal(category.name, modalCurrentPage + 1);
+    }
+});
+
+document.getElementById('modal-transaction-list').addEventListener('click', e => {
+    const item = e.target.closest('.transaction-item');
+    if (!item) return;
+
+    const dateToFilter = item.dataset.date;
+    hideBudgetModal();
+    searchDateInput.value = dateToFilter;
+    searchDateInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    setTimeout(() => {
+        const cardElement = grid.querySelector(`.paycheck-card:not(.hidden)`);
+        if (cardElement) cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+});
+
+const headerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        stickyNav.classList.toggle('hidden', entry.isIntersecting);
+    });
+}, { threshold: 0.1 });
+
+const mainTitle = document.querySelector('h1');
+if (mainTitle) {
+    headerObserver.observe(mainTitle);
+}
+
+stickyNav.addEventListener('click', e => {
+    if (e.target.tagName === 'A') {
+        e.preventDefault();
+        const link = e.target;
+        const targetId = link.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+
+        if (targetElement) {
+            const header = targetElement;
+            const container = header.nextElementSibling;
+
+            if (container && container.classList.contains('collapsed')) {
+                container.classList.remove('collapsed');
+                header.querySelector('.toggle-arrow').classList.remove('collapsed');
+                
+                const settingKey = `is${header.id.charAt(0).toUpperCase() + header.id.slice(1).replace('-header', '')}Collapsed`;
+                if (appSettings.hasOwnProperty(settingKey)) {
+                    appSettings[settingKey] = false;
+                    saveData(false);
+                }
+            }
+
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+});
+
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+}
+
+const allSections = document.querySelectorAll('.section-header');
+const allNavLinks = document.querySelectorAll('#sticky-nav a');
+
+function highlightNavLink() {
+    let index = allSections.length;
+    const triggerPoint = window.scrollY + (window.innerHeight / 2);
+
+    while(--index && triggerPoint < allSections[index].offsetTop) {}
+    
+    allNavLinks.forEach((link) => link.classList.remove('active'));
+    if (index >= 0 && allNavLinks[index]) {
+         allNavLinks[index].classList.add('active');
+    }
+}
+
+window.addEventListener('scroll', throttle(highlightNavLink, 100));
+
+stickyNavToggle.addEventListener('click', () => {
+    stickyNav.classList.toggle('collapsed');
+    const isCollapsed = stickyNav.classList.contains('collapsed');
+    stickyNavToggle.textContent = isCollapsed ? '»' : '«';
+    stickyNavToggle.title = isCollapsed ? 'Expand Navigation' : 'Collapse Navigation';
+    appSettings.isNavCollapsed = isCollapsed;
+    saveData(false);
+});
+
+// --- INITIALIZATION ---
+function init() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggle.innerHTML  = '&#9728;&#65039;';
+    }
+    const savedData = localStorage.getItem('budgetPlannerDataDesktopV1.5.0');
+    if (savedData) {
+        try {
+            const allData = JSON.parse(savedData);
+			if (allData.settings) {
+				appSettings = {...appSettings, ...allData.settings};
+				if (appSettings.actualBalance) actualBalanceInput.value = appSettings.actualBalance;
+			}
+            if (allData.bills) monthlyBillsData = allData.bills;
+            if (allData.savings) savingsGoalsData = allData.savings;
+            if (allData.categories) categoriesData = allData.categories;
+            if (allData.categoryMap) expenseCategoryMap = allData.categoryMap;
+			if (allData.categories) {
+                categoriesData = allData.categories;
+                const defaultCategoryNames = ['Groceries', 'Dining Out', 'Transportation', 'Entertainment', 'Shopping', 'Subscriptions'];
+                categoriesData.forEach(cat => {
+                    if (defaultCategoryNames.includes(cat.name)) cat.isDefault = true;
+                    if (cat.budget === undefined) cat.budget = 0;
+                });
+            }
+            if (allData.budget) {
+                budgetData = allData.budget;
+                budgetData.forEach(p => { if (!p.id) p.id = Date.now() + Math.random(); });
+            }
+        } catch (error) { console.error('Failed to load saved data:', error); }
+    }
+    payFrequencySelect.value = appSettings.payFrequency;
+    enablePaydayAdvanceCheckbox.checked = appSettings.isPaydayAdvanceEnabled;
+    sortPaychecksSelect.value = appSettings.sortPreference;
+	itemsPerPageSelect.value = appSettings.itemsPerPage;
+    budgetContainer.classList.toggle('payday-advance-hidden', !appSettings.isPaydayAdvanceEnabled);
+    if (appSettings.isBillsCollapsed) {
+        billsContainer.classList.add('collapsed');
+        billsHeader.querySelector('.toggle-arrow').classList.add('collapsed');
+    }
+    if (appSettings.isTickerCollapsed) {
+        document.getElementById('negative-ticker-content').classList.add('collapsed');
+        negativeTickerContainer.querySelector('.toggle-arrow').classList.add('collapsed');
+    }
+	if (appSettings.isSavingsCollapsed) {
+        savingsContainer.classList.add('collapsed');
+        savingsHeader.querySelector('.toggle-arrow').classList.add('collapsed');
+    }
+    if (appSettings.isInsightsCollapsed) {
+        insightsContainer.classList.add('collapsed');
+        insightsHeader.querySelector('.toggle-arrow').classList.add('collapsed');
+    }
+	if (appSettings.isCategoriesCollapsed) {
+        categoriesContainer.classList.add('collapsed');
+        categoriesHeader.querySelector('.toggle-arrow').classList.add('collapsed');
+    }
+	if (appSettings.isPaychecksCollapsed) {
+		paychecksContainer.classList.add('collapsed');
+		paychecksHeader.querySelector('.toggle-arrow').classList.add('collapsed');
+	}
+	if (appSettings.isNavCollapsed) {
+		stickyNav.classList.add('collapsed');
+		stickyNavToggle.textContent = '»';
+		stickyNavToggle.title = 'Expand Navigation';
+	}
+    renderBillsTable();
+	renderSavingsGoals();
+	renderCategoryManagement();
+    renderPaycheckCards();
+}
+init();
+</script>
+
+</body>
+</html>
