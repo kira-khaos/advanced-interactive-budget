@@ -74,6 +74,7 @@ To create the setup file yourself, run the following command in your terminal fr
 
 ```bash
 npm run make
+ ```
 
 ---
 ## ☕ Support the Creator
