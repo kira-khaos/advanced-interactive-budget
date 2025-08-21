@@ -1,7 +1,7 @@
 {
   "name": "AdvancedInteractiveBudget",
   "productName": "Advanced Interactive Budget",
-  "version": "1.5.1",
+  "version": "1.6.4",
   "description": "A desktop application for managing a personal budget.",
   "main": "main.js",
   "author": "Casey Ward",

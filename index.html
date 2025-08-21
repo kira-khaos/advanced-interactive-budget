@@ -19,13 +19,17 @@
 </nav>
 <div id="toast-notification"></div>
 <div class="container" id="budget-container">
-    <h1>Advanced Interactive Budget</h1>
-    <div class="controls-panel" id="controls-panel">
-        <button id="save-btn" class="btn btn-save">Save</button>
-        <button id="reset-btn" class="btn btn-reset">Reset to Default</button>
-		<button id="clear-all-btn" class="btn btn-clear">Clear All</button>
-        <button id="theme-toggle" class="btn" style="margin-left: auto;">&#127769;</button>
-    </div>
+	<h1 id="budget-title" contenteditable="true">Advanced Interactive Budget</h1>
+	<div class="controls-panel" id="controls-panel">
+		<button id="save-btn" class="btn btn-save">Save</button>
+		<button id="reset-btn" class="btn btn-reset">Reset to Default</button>
+		<button id="clear-all-btn" class="btn btn-clear" style="margin-left: auto;">Clear All</button> 
+		
+		<button id="backup-btn" class="btn">Backup Data</button>
+		<button id="restore-btn" class="btn">Restore Data</button>
+		<input type="file" id="restore-file-input" accept=".json" style="display: none;">
+		<button id="theme-toggle" class="btn">&#127769;</button>
+	</div>
     <div class="settings-panel">
         <div>
             <label for="pay-frequency">Pay Frequency:</label>
@@ -299,6 +303,10 @@ const paychecksHeader = document.getElementById('paychecks-header');
 const paychecksContainer = document.getElementById('paychecks-container');
 const stickyNav = document.getElementById('sticky-nav');
 const stickyNavToggle = document.getElementById('sticky-nav-toggle');
+const backupBtn = document.getElementById('backup-btn');
+const restoreBtn = document.getElementById('restore-btn');
+const restoreFileInput = document.getElementById('restore-file-input');
+const budgetTitle = document.getElementById('budget-title');
 
 // --- HELPER FUNCTIONS ---
 
@@ -476,6 +484,80 @@ function hideBudgetModal() {
     budgetModal.classList.add('modal-hidden');
 }
 
+function handleBackup() {
+    const backupData = {
+        settings: appSettings,
+        bills: monthlyBillsData,
+        savings: savingsGoalsData,
+        categories: categoriesData,
+        categoryMap: expenseCategoryMap,
+        budget: budgetData
+    };
+
+    const jsonString = JSON.stringify(backupData, null, 2);
+
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const date = new Date().toISOString().slice(0, 10);
+    link.download = `budget-backup-${date}.json`;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('Backup file created!');
+}
+
+function handleRestore(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restoredData = JSON.parse(e.target.result);
+
+            if (!restoredData.settings || !restoredData.bills || !restoredData.budget) {
+                throw new Error("Invalid backup file format.");
+            }
+
+            if (!confirm('This will overwrite all current data with the backup file. Are you sure?')) {
+                document.getElementById('restore-file-input').value = '';
+                return;
+            }
+
+            appSettings = restoredData.settings;
+			budgetTitle.textContent = appSettings.budgetTitle || 'Advanced Interactive Budget';
+            monthlyBillsData = restoredData.bills;
+            savingsGoalsData = restoredData.savings;
+            categoriesData = restoredData.categories;
+            expenseCategoryMap = restoredData.categoryMap;
+            budgetData = restoredData.budget;
+            
+            renderBillsTable();
+            renderSavingsGoals();
+            renderCategoryManagement();
+            renderPaycheckCards();
+            recalculateAll();
+
+            saveData(false);
+            showToast('Data restored successfully!');
+			if (window.electronAPI) {
+				window.electronAPI.refocusWindow();
+			}
+        } catch (error) {
+            console.error('Failed to restore data:', error);
+            showToast('Error: Could not read the backup file.', 'error');
+        } finally {
+            document.getElementById('restore-file-input').value = '';
+        }
+    };
+    reader.readAsText(file);
+}
 
 // --- CORE LOGIC & RENDER FUNCTIONS ---
 
@@ -1204,7 +1286,7 @@ billsTable.addEventListener('click', e => {
     }
 });
 
-addBillBtn.addEventListener('click', () => { monthlyBillsData.push({ name: 'New Bill', amount: '$0.00', dueDate: 1, saveTillDue: false, notes: '' }); renderBillsTable(); });
+addBillBtn.addEventListener('click', () => { monthlyBillsData.push({ name: 'New Bill', amount: '$0.00', dueDate: 1, saveTillDue: false, notes: '' }); renderBillsTable(); budgetContainer.offsetHeight; });
 
 grid.addEventListener('input', e => { syncUIToData(); recalculateAll(); });
 
@@ -1237,17 +1319,22 @@ grid.addEventListener('click', e => {
         if (confirm('Are you sure you want to delete this entire paycheck?')) {
             const indexToDelete = budgetData.findIndex(p => p.id === cardId);
             if (indexToDelete > -1) { budgetData.splice(indexToDelete, 1); renderPaycheckCards(); }
+			if (window.electronAPI) {
+				window.electronAPI.refocusWindow();
+			}
         }
     }
     if (e.target.classList.contains('add-expense-btn')) { 
         syncUIToData();
         cardData.expenses.push({ name: '', amount: 0, ignoreSavings: false }); 
         renderPaycheckCards(); 
+		budgetContainer.offsetHeight;
     }
     if (e.target.classList.contains('add-income-btn')) { 
         syncUIToData();
         cardData.income.push({ name: 'Extra Income', amount: 0, ignoreSavings: false }); 
         renderPaycheckCards(); 
+		budgetContainer.offsetHeight;
     }
     if (e.target.classList.contains('delete-item')) {
         e.preventDefault();
@@ -1356,7 +1443,13 @@ nextPageBtn.addEventListener('click', () => {
 
 saveBtn.addEventListener('click', () => saveData(true));
 
-resetBtn.addEventListener('click', () => { if (confirm('Are you sure?')) { localStorage.removeItem('budgetPlannerDataDesktopV1.5.0'); location.reload(); } });
+backupBtn.addEventListener('click', handleBackup);
+restoreBtn.addEventListener('click', () => restoreFileInput.click());
+restoreFileInput.addEventListener('change', handleRestore);
+
+resetBtn.addEventListener('click', () => { if (confirm('Are you sure?')) { localStorage.removeItem('budgetPlannerDataDesktopV1.5.0'); location.reload(); if (window.electronAPI) {
+            window.electronAPI.refocusWindow();
+        }} });
 
 clearAllBtn.addEventListener('click', () => {
     if (confirm('Are you sure you want to clear all data and reset categories to default? This will not be saved until you click the "Save" button.')) {
@@ -1369,6 +1462,11 @@ clearAllBtn.addEventListener('click', () => {
 
         actualBalanceInput.value = '';
         appSettings.actualBalance = '';
+		
+		budgetTitle.textContent = 'Advanced Interactive Budget';
+		
+        currentPage = 1; 
+        currentSearchDate = null;
 
         renderBillsTable();
         renderSavingsGoals();
@@ -1376,6 +1474,9 @@ clearAllBtn.addEventListener('click', () => {
         renderPaycheckCards();
 
         showToast('All data cleared and categories reset.');
+        if (window.electronAPI) {
+            window.electronAPI.refocusWindow();
+        }
     }
 });
 
@@ -1641,6 +1742,11 @@ stickyNavToggle.addEventListener('click', () => {
     saveData(false);
 });
 
+budgetTitle.addEventListener('blur', () => {
+    appSettings.budgetTitle = budgetTitle.textContent;
+    saveData(false);
+});
+
 // --- INITIALIZATION ---
 function init() {
     const savedTheme = localStorage.getItem('theme');
@@ -1655,6 +1761,7 @@ function init() {
 			if (allData.settings) {
 				appSettings = {...appSettings, ...allData.settings};
 				if (appSettings.actualBalance) actualBalanceInput.value = appSettings.actualBalance;
+				if (appSettings.budgetTitle) budgetTitle.textContent = appSettings.budgetTitle;
 			}
             if (allData.bills) monthlyBillsData = allData.bills;
             if (allData.savings) savingsGoalsData = allData.savings;

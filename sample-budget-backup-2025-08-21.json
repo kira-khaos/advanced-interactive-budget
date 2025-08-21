@@ -1,0 +1,214 @@
+{
+  "settings": {
+    "payFrequency": "weekly",
+    "isPaydayAdvanceEnabled": true,
+    "isBillsCollapsed": false,
+    "sortPreference": "date-desc",
+    "isTickerCollapsed": false,
+    "itemsPerPage": 6,
+    "isSavingsCollapsed": false,
+    "isCategoriesCollapsed": false,
+    "actualBalance": "",
+    "isPaychecksCollapsed": false,
+    "isNavCollapsed": false
+  },
+  "bills": [
+    {
+      "name": "Rent/Mortgage",
+      "amount": "$1200.00",
+      "dueDate": 1,
+      "notes": "Primary housing cost",
+      "saveTillDue": true
+    },
+    {
+      "name": "Car Payment",
+      "amount": "$350.00",
+      "dueDate": 15,
+      "notes": "",
+      "saveTillDue": true
+    },
+    {
+      "name": "Utilities",
+      "amount": "~$150.00",
+      "dueDate": 20,
+      "notes": "Electric, Water, Gas",
+      "saveTillDue": false
+    },
+    {
+      "name": "Internet",
+      "amount": "$60.00",
+      "dueDate": 22,
+      "notes": "",
+      "saveTillDue": false
+    },
+    {
+      "name": "Phone Bill",
+      "amount": "$85.00",
+      "dueDate": 25,
+      "notes": "",
+      "saveTillDue": false
+    },
+    {
+      "name": "Student Loan",
+      "amount": "$200.00",
+      "dueDate": 28,
+      "notes": "",
+      "saveTillDue": false
+    }
+  ],
+  "savings": [
+    {
+      "id": 1,
+      "name": "Rainy Day Fund",
+      "goal": 1000
+    },
+    {
+      "id": 2,
+      "name": "New Car",
+      "goal": 5000
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Groceries",
+      "isDefault": true,
+      "budget": 400
+    },
+    {
+      "id": 2,
+      "name": "Dining Out",
+      "isDefault": true,
+      "budget": 150
+    },
+    {
+      "id": 3,
+      "name": "Transportation",
+      "isDefault": true,
+      "budget": 100
+    },
+    {
+      "id": 4,
+      "name": "Entertainment",
+      "isDefault": true,
+      "budget": 75
+    },
+    {
+      "id": 5,
+      "name": "Shopping",
+      "isDefault": true,
+      "budget": 100
+    },
+    {
+      "id": 6,
+      "name": "Subscriptions",
+      "isDefault": true,
+      "budget": 30
+    }
+  ],
+  "categoryMap": {},
+  "budget": [
+    {
+      "id": 1,
+      "date": "Paycheck - August 1",
+      "baseNetPay": 850.55,
+      "instantCo": 0,
+      "expenses": [
+        {
+          "name": "Rent/Mortgage",
+          "amount": 600,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Groceries",
+          "amount": 150,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Gas",
+          "amount": 40,
+          "ignoreSavings": false
+        }
+      ],
+      "income": []
+    },
+    {
+      "id": 2,
+      "date": "Paycheck - August 8",
+      "baseNetPay": 845.2,
+      "instantCo": 0,
+      "expenses": [
+        {
+          "name": "Rent/Mortgage",
+          "amount": 600,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Internet",
+          "amount": 60,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Groceries",
+          "amount": 120,
+          "ignoreSavings": false
+        }
+      ],
+      "income": []
+    },
+    {
+      "id": 3,
+      "date": "Paycheck - August 15",
+      "baseNetPay": 855,
+      "instantCo": 50,
+      "expenses": [
+        {
+          "name": "Car Payment",
+          "amount": 350,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Utilities",
+          "amount": 150,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Entertainment",
+          "amount": 100,
+          "ignoreSavings": false
+        }
+      ],
+      "income": [
+        {
+          "name": "Freelance Gig",
+          "amount": 150,
+          "ignoreSavings": false
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "date": "Paycheck - August 22",
+      "baseNetPay": 851.75,
+      "instantCo": 0,
+      "expenses": [
+        {
+          "name": "Phone Bill",
+          "amount": 85,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Student Loan",
+          "amount": 200,
+          "ignoreSavings": false
+        },
+        {
+          "name": "Groceries",
+          "amount": 150,
+          "ignoreSavings": false
+        }
+      ],
+      "income": []
+    }
+  ]
+}
