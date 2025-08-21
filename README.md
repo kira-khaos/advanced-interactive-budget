@@ -6,15 +6,15 @@ A simple, powerful, and private desktop application for managing a personal budg
 
 This application is packed with features to give you a comprehensive overview of your finances and help you make smarter decisions.
 
-* **Detailed Paycheck Breakdown:** Add each paycheck and track every expense and extra piece of income associated with it.
-* **Customizable Categories:** Create your own spending categories (e.g., "Pets," "Hobbies") and set monthly budgets for them.
-* **Live Budget Tracking:** Visually track your spending progress with progress bars that change color as you near your limit.
-* **In-Depth Transaction History:** Click on any category to see a detailed, paginated list of all transactions for the current month.
-* **Smart Insights Engine:** Get automated, personalized tips based on your spending habits, savings, and balance reconciliation.
-* **Balance Reconciliation:** Enter your actual bank balance to see the difference compared to your projected balance, helping you easily spot un-entered transactions.
-* **Savings Goals:** Create savings funds like "Rainy Day Fund" or "New Car" and track your contributions.
-* **Modern & Clean UI:** All major sections are collapsible, a sticky side navigation appears on scroll, and a beautiful dark mode theme is included.
-* **Local Data Storage:** Your financial data is saved directly on your computer, not in the cloud.
+* **Detailed Paycheck Breakdown:** Track your income paycheck by paycheck and see exactly where every dollar goes.  
+* **Customizable Categories:** Create your own categories (e.g., *Pets*, *Hobbies*, *Subscriptions*) and assign budgets to them.  
+* **Real-Time Budget Tracking:** Watch your category budgets update instantly as you add expenses or income.  
+* **Transaction History:** Drill down into any category to view a detailed, paginated history of your transactions for the month.  
+* **Balance Reconciliation:** Compare your projected balance against your actual bank balance to easily catch missing or forgotten transactions.  
+* **Smart Insights Engine:** Get automatic, personalized insights into your spending, savings progress, and areas for improvement.  
+* **Savings Goals:** Create and track funds (e.g., *Rainy Day Fund*, *New Car*, *Vacation*) and monitor your contributions over time.  
+* **Clean, Modern Interface:** Collapsible sections, smooth navigation, and built-in dark mode make the app pleasant and easy to use.  
+* **Offline & Private:** Works entirely without internet. Your financial data never leaves your computer.  
 
 ---
 ## How to Use
@@ -74,3 +74,11 @@ To create the setup file yourself, run the following command in your terminal fr
 
 ```bash
 npm run make
+ ```
+
+---
+## ☕ Support the Creator
+
+If you find this application helpful and would like to support my work, you can buy me a coffee! Any support is greatly appreciated.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kirakhaos)
