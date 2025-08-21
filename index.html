@@ -1261,8 +1261,28 @@ savingsGrid.addEventListener('input', e => {
         goal.name = e.target.textContent;
     } else if (field === 'goal') {
         goal.goal = parseFloat(e.target.value) || 0;
+        
+        // Find the specific elements inside this card to update
+        const progressText = card.querySelector('.savings-progress-text');
+        const progressBarFill = card.querySelector('.savings-progress-bar-fill');
+
+        // Recalculate the current amount (this logic is from your renderSavingsGoals function)
+        let currentAmount = 0;
+        budgetData.forEach(paycheck => {
+            (paycheck.expenses || []).forEach(expense => {
+                if (expense.name === goal.name) {
+                    currentAmount += expense.amount;
+                }
+            });
+        });
+        
+        const percentage = goal.goal > 0 ? (currentAmount / goal.goal) * 100 : 0;
+        
+        // Update only what's necessary, without a full re-render
+        progressText.textContent = `$${currentAmount.toFixed(2)} / $${goal.goal.toFixed(2)}`;
+        progressBarFill.style.width = `${Math.min(percentage, 100)}%`;
+        progressBarFill.textContent = `${percentage.toFixed(0)}%`;
     }
-    setTimeout(renderSavingsGoals, 300);
 });
 
 billsTable.addEventListener('input', e => {
